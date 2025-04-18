@@ -6,7 +6,7 @@ import threading
 
 def main(rts):
     try:
-        default_pace = 1.0
+        default_pace = 0.5
 
         amg8833_ad=AMG8833_adapter(rts=rts, pace=default_pace)
 
