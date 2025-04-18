@@ -6,24 +6,21 @@ import random, time
 api_blueprint = Blueprint('api', __name__)
 
 
-@api_blueprint.route('/temperature', methods=['POST'])
-def write_temperature():
-    keys = ['t_max', 't_thermistor'] + [
-        f'array{row}{col}' for row in range(8) for col in range(8)
-    ]
+@api_blueprint.route('/get_tmax', methods=['POST'])
+def get_tmax():
+    return jsonify({'t_max' : rts.get('t_max')[1]})  #timestamp, value
 
-    result = {}
+@api_blueprint.route('/get_tthermistor', methods=['POST'])
+def get_tthermistor():
+    return jsonify({'t_thermistor' : rts.get('t_thermistor')[1]})
+
+@api_blueprint.route('/get_tarray', methods=['POST'])
+def get_tarray():
+    keys = [f'array{row}{col}' for row in range(8) for col in range(8)]
+    array = {}
 
     for key in keys:
-        try:
-            data_point = rts.get(key)
-            if data_point:
-                timestamp, value = data_point
-                result[key] = {
-                    'timestamp': timestamp,
-                    'value': value
-                }
-        except Exception as e:
-            result[key] = {'error': str(e)}
+        p_array_val = rts.get(key)[1]
+        array[key] = p_array_val
 
-    return jsonify(result)
+    return jsonify(array)
