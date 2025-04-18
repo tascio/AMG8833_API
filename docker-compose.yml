@@ -1,0 +1,28 @@
+services:
+  redistimeseries:
+    container_name: redis_store_container
+    image: redisfab/redistimeseries:master-arm64v8-jammy
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./rts_data:/data
+    command:
+     [ "redis-server","--loadmodule","/usr/lib/redis/modules/redistimeseries.so", "--appendonly","yes","--save", "120", "1000"]
+  
+  api_manager:
+    container_name: api_manager_container
+    image: api_manager_image
+    build: ./rest_api
+    volumes:
+      - ./rest_api/app:/app
+    depends_on:
+      - redistimeseries
+    ports:
+      - "5050:5050"
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+    privileged: true
+    command: >
+      gunicorn -w 1 -b 0.0.0.0:5050 app:app --log-level=info --access-logfile=- --error-logfile=-
+    environment:
+      - PYTHONUNBUFFERED=1
