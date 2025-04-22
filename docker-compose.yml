@@ -8,6 +8,9 @@ services:
       - ./rts_data:/data
     command:
      [ "redis-server","--loadmodule","/usr/lib/redis/modules/redistimeseries.so", "--appendonly","yes","--save", "120", "1000"]
+    networks:
+      amg_mon:
+        ipv4_address: 172.50.0.200
   
   api_manager:
     container_name: api_manager_container
@@ -26,3 +29,30 @@ services:
       gunicorn -w 1 -b 0.0.0.0:5050 app:app --log-level=info --access-logfile=- --error-logfile=-
     environment:
       - PYTHONUNBUFFERED=1
+    networks:
+      amg_mon:
+        ipv4_address: 172.50.0.50
+
+  websocket_manager:
+    container_name: websocket_manager_container
+    image: websocket_manager_image
+    build: ./websocket
+    volumes:
+      - ./websocket/app:/app
+    depends_on:
+      - redistimeseries
+    ports:
+      - "5060:5060"
+    environment:
+      - FLASK_ENV=production
+    networks:
+      amg_mon:
+        ipv4_address: 172.50.0.100
+
+
+networks:
+  amg_mon:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.50.0.0/24

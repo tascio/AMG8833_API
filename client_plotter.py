@@ -103,6 +103,6 @@ while running:
 
     pygame.display.flip()  # Aggiorna lo schermo
 
-    clock.tick(FPS)  # Limita a 30 FPS per non sovraccaricare
-
+    clock.tick(FPS)  
+    
 pygame.quit()
