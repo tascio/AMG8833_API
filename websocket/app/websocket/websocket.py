@@ -1,9 +1,9 @@
 from flask_socketio import emit, SocketIO
-from websocket import rts
 import eventlet
 
 
-def register_websocket_events(socketio, rts, logger):
+def main(rts, socketio, logger):
+
     @socketio.on('connect')
     def handle_connect():
         print('ok')
