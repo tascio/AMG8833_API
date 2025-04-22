@@ -1,4 +1,5 @@
 from flask_socketio import emit, SocketIO
+from flask import request
 import eventlet
 
 
@@ -6,13 +7,21 @@ def main(rts, socketio, logger):
 
     @socketio.on('connect')
     def handle_connect():
-        print('ok')
+        client_sid = request.sid
+        client_ip = request.remote_addr #client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        user_agent = request.headers.get('User-Agent', 'unknown')
+
         emit('message', {'status': 'connected'})
-        logger.info('[SocketIO] Client connected')
+        logger.info(f'[SocketIO] Client connected - SID: {client_sid}, IP: {client_ip}, User-Agent: {user_agent}')
 
     @socketio.on('disconnect')
     def handle_disconnect():
-        logger.info('[SocketIO] Client disconnected')
+        client_sid = request.sid
+        client_ip = request.remote_addr #client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        user_agent = request.headers.get('User-Agent', 'unknown')
+
+        logger.info(f'[SocketIO] Client disconnected - SID: {client_sid}, IP: {client_ip}, User-Agent: {user_agent}')
+
 
 
     def background_emit():
